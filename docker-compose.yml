@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  web:
+    build: .
+    container_name: nextjs_app
+    restart: unless-stopped
+    networks:
+      - app-network
+    expose:
+      - "3000"
+    environment:
+      NODE_ENV: production
+      POSTGRES_USER: pumpzdb
+      POSTGRES_PASSWORD: C.X6*48G0Pa3zsf*EYY\e&h[
+      POSTGRES_DB: pumpzdb
+      POSTGRES_HOST: ip-172-31-18-106.us-east-2.compute.internal
+      NEXT_PUBLIC_BASE_URL: http://localhost:3000
+    # Removed 'env_file' since we're setting envs directly here
+    # Ensure 'depends_on' is correct
+    # Remove 'depends_on' from 'web' service to avoid circular dependency
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - web
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
